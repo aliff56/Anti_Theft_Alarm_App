@@ -88,11 +88,14 @@ class _MyHomePageState extends State<MyHomePage> {
   String? _appliedAudio;
   String? _appliedLoop;
   bool _appliedVibrate = false;
+  bool _appliedFlash = false;
+  bool _pickpocketMode = false;
 
   @override
   void initState() {
     super.initState();
     _loadAppliedAudio();
+    _loadPickpocketMode();
     _requestNotificationPermission();
     platform.setMethodCallHandler((call) async {
       if (call.method == 'disarmedByNotification') {
@@ -109,7 +112,25 @@ class _MyHomePageState extends State<MyHomePage> {
       _appliedAudio = prefs.getString('selected_audio') ?? 'alarm.wav';
       _appliedLoop = prefs.getString('selected_loop') ?? 'infinite';
       _appliedVibrate = prefs.getBool('selected_vibrate') ?? false;
+      _appliedFlash = prefs.getBool('selected_flash') ?? false;
     });
+  }
+
+  Future<void> _loadPickpocketMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _pickpocketMode = prefs.getBool('pickpocket_mode') ?? false;
+    });
+    await platform.invokeMethod('setPickpocketMode', {
+      'enabled': _pickpocketMode,
+    });
+  }
+
+  Future<void> _setPickpocketMode(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('pickpocket_mode', enabled);
+    setState(() => _pickpocketMode = enabled);
+    await platform.invokeMethod('setPickpocketMode', {'enabled': enabled});
   }
 
   Future<void> _requestNotificationPermission() async {
@@ -136,15 +157,18 @@ class _MyHomePageState extends State<MyHomePage> {
     String fileName,
     String loop,
     bool vibrate,
+    bool flash,
   ) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('selected_audio', fileName);
     await prefs.setString('selected_loop', loop);
     await prefs.setBool('selected_vibrate', vibrate);
+    await prefs.setBool('selected_flash', flash);
     await platform.invokeMethod('setAudio', {
       'fileName': fileName,
       'loop': loop,
       'vibrate': vibrate,
+      'flash': flash,
     });
     await _loadAppliedAudio(); // Refresh state after applying
   }
@@ -169,14 +193,29 @@ class _MyHomePageState extends State<MyHomePage> {
           Center(
             child: _AnimatedArmButton(armed: _armed, onToggle: _toggleArm),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
+          SwitchListTile(
+            title: const Text(
+              'Pickpocket Mode',
+              style: TextStyle(color: Colors.white),
+            ),
+            subtitle: const Text(
+              'Only alert if phone is pulled out of pocket',
+              style: TextStyle(color: Colors.white70),
+            ),
+            value: _pickpocketMode,
+            onChanged: (val) => _setPickpocketMode(val),
+            activeColor: Colors.tealAccent,
+          ),
+          const SizedBox(height: 8),
           Expanded(
             child: AudioSelectionGrid(
               appliedAudio: _appliedAudio,
               appliedLoop: _appliedLoop,
               appliedVibrate: _appliedVibrate,
-              onApply: (option, loop, vibrate) {
-                _setSelectedAudio(option.fileName, loop, vibrate);
+              appliedFlash: _appliedFlash,
+              onApply: (option, loop, vibrate, flash) {
+                _setSelectedAudio(option.fileName, loop, vibrate, flash);
               },
             ),
           ),

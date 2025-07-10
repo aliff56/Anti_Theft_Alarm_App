@@ -22,16 +22,19 @@ final List<AudioOption> audioOptions = [
 ];
 
 class AudioSelectionGrid extends StatelessWidget {
-  final void Function(AudioOption, String loop, bool vibrate)? onApply;
+  final void Function(AudioOption, String loop, bool vibrate, bool flash)?
+  onApply;
   final String? appliedAudio;
   final String? appliedLoop;
   final bool? appliedVibrate;
+  final bool? appliedFlash;
   const AudioSelectionGrid({
     Key? key,
     this.onApply,
     this.appliedAudio,
     this.appliedLoop,
     this.appliedVibrate,
+    this.appliedFlash,
   }) : super(key: key);
 
   @override
@@ -47,7 +50,8 @@ class AudioSelectionGrid extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: rowOptions.map((option) {
               final isApplied = option.fileName == appliedAudio;
-              return Expanded(
+              return SizedBox(
+                width: 120,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6.0),
                   child: GestureDetector(
@@ -60,19 +64,20 @@ class AudioSelectionGrid extends StatelessWidget {
                             appliedLoop: appliedLoop,
                             appliedVibrate: appliedVibrate ?? false,
                             onApply: onApply,
+                            appliedFlash: appliedFlash,
                           ),
                         ),
                       );
                     },
-                    child: Stack(
-                      children: [
-                        Card(
-                          elevation: 4,
-                          color: Theme.of(context).cardColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Container(
+                    child: Card(
+                      elevation: 4,
+                      color: Theme.of(context).cardColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Stack(
+                        children: [
+                          Container(
                             height: 140,
                             padding: const EdgeInsets.all(12),
                             child: Column(
@@ -84,45 +89,63 @@ class AudioSelectionGrid extends StatelessWidget {
                                   color: Colors.tealAccent,
                                 ),
                                 const SizedBox(height: 8),
-                                Text(
-                                  option.label,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                Center(
+                                  child: Text(
+                                    option.label,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
                                 const SizedBox(height: 4),
-                                Text(
-                                  option.description,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.white70,
+                                Center(
+                                  child: Text(
+                                    option.description,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.white70,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                        if (isApplied)
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: CircleAvatar(
-                              backgroundColor: Colors.tealAccent,
-                              radius: 10,
-                              child: Icon(
-                                Icons.check,
-                                color: Colors.black,
-                                size: 14,
+                          if (isApplied)
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.tealAccent,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.3),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(4.0),
+                                  child: Icon(
+                                    Icons.check,
+                                    color: Colors.black,
+                                    size: 12,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -144,12 +167,15 @@ class AudioOptionDetailPage extends StatefulWidget {
   final bool isApplied;
   final String? appliedLoop;
   final bool appliedVibrate;
-  final void Function(AudioOption, String loop, bool vibrate)? onApply;
+  final bool? appliedFlash;
+  final void Function(AudioOption, String loop, bool vibrate, bool flash)?
+  onApply;
   const AudioOptionDetailPage({
     required this.option,
     required this.isApplied,
     this.appliedLoop,
     required this.appliedVibrate,
+    this.appliedFlash,
     this.onApply,
   });
 
@@ -162,18 +188,20 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage> {
   bool _isPlaying = false;
   late String _selectedLoop;
   bool _vibrate = false;
+  bool _flash = false;
 
   @override
   void initState() {
     super.initState();
     _selectedLoop = widget.appliedLoop ?? 'infinite';
-    _loadVibrate();
+    _loadSettings();
   }
 
-  Future<void> _loadVibrate() async {
+  Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _vibrate = prefs.getBool('selected_vibrate') ?? false;
+      _flash = prefs.getBool('selected_flash') ?? false;
     });
   }
 
@@ -188,7 +216,7 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage> {
       await _player.stop();
       setState(() => _isPlaying = false);
     } else {
-      final assetPath = 'assets/sounds/${widget.option.fileName}';
+      final assetPath = 'sounds/${widget.option.fileName}';
       try {
         await _player.play(AssetSource(assetPath));
         setState(() => _isPlaying = true);
@@ -276,6 +304,7 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage> {
                             widget.option,
                             _selectedLoop,
                             _vibrate,
+                            _flash,
                           );
                           Navigator.pop(context);
                         },
@@ -311,6 +340,24 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage> {
                 ),
                 const Text(
                   'Vibrate on alarm',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Checkbox(
+                  value: _flash,
+                  onChanged: widget.isApplied
+                      ? null
+                      : (val) => setState(() => _flash = val ?? false),
+                  activeColor: Colors.tealAccent,
+                  checkColor: Colors.black,
+                ),
+                const Text(
+                  'Flash Alert',
                   style: TextStyle(color: Colors.white),
                 ),
               ],

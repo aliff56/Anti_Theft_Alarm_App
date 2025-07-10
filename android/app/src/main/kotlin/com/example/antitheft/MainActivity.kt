@@ -12,6 +12,8 @@ class MainActivity : FlutterActivity() {
         var selectedAudioFile: String = "alarm.wav"
         var selectedLoop: String = "infinite"
         var selectedVibrate: Boolean = false
+        var selectedFlash: Boolean = false
+        var pickpocketMode: Boolean = false
         var methodChannel: MethodChannel? = null
         fun notifyFlutterDisarmed() {
             methodChannel?.invokeMethod("disarmedByNotification", null)
@@ -47,9 +49,20 @@ class MainActivity : FlutterActivity() {
                     val fileName = call.argument<String>("fileName") ?: "alarm.wav"
                     val loop = call.argument<String>("loop") ?: "infinite"
                     val vibrate = call.argument<Boolean>("vibrate") ?: false
+                    val flash = call.argument<Boolean>("flash") ?: false
                     selectedAudioFile = fileName
                     selectedLoop = loop
                     selectedVibrate = vibrate
+                    selectedFlash = flash
+                    // Reload audio in the service if it's running
+                    val intent = Intent(this, AntiTheftService::class.java)
+                    intent.action = "RELOAD_AUDIO"
+                    startForegroundService(intent)
+                    result.success(null)
+                }
+                "setPickpocketMode" -> {
+                    val enabled = call.argument<Boolean>("enabled") ?: false
+                    pickpocketMode = enabled
                     result.success(null)
                 }
                 else -> result.notImplemented()
