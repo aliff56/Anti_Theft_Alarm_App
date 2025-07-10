@@ -28,6 +28,7 @@ class AudioSelectionGrid extends StatelessWidget {
   final String? appliedLoop;
   final bool? appliedVibrate;
   final bool? appliedFlash;
+  final Widget? footer;
   const AudioSelectionGrid({
     Key? key,
     this.onApply,
@@ -35,6 +36,7 @@ class AudioSelectionGrid extends StatelessWidget {
     this.appliedLoop,
     this.appliedVibrate,
     this.appliedFlash,
+    this.footer,
   }) : super(key: key);
 
   @override
@@ -152,6 +154,14 @@ class AudioSelectionGrid extends StatelessWidget {
               );
             }).toList(),
           ),
+        ),
+      );
+    }
+    if (footer != null) {
+      rows.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+          child: footer!,
         ),
       );
     }

@@ -37,6 +37,8 @@ dependencies:
   audioplayers:
   wakelock_plus:
   shared_preferences:
+  wallpaper_manager_flutter: ^1.0.1
+  animated_check: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -93,3 +95,4 @@ flutter:
 
   assets:
     - assets/sounds/
+    - assets/wallpapers/
