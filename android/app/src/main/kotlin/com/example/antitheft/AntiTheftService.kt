@@ -83,14 +83,16 @@ class AntiTheftService : Service(), SensorEventListener {
 
     private fun getAudioResId(fileName: String): Int {
         return when (fileName) {
-            "alarm.wav" -> R.raw.alarm
-            "alarm2.flac" -> R.raw.alarm2
-            "alert.wav" -> R.raw.alert
-            "bark.wav" -> R.raw.bark
-            "police.mp3" -> R.raw.police
-            "siren.wav" -> R.raw.siren
-            "siren2.wav" -> R.raw.siren2
-            else -> R.raw.alarm
+            "alarm.wav" -> R.raw.warning_alarm // fallback to warning_alarm
+            "alarm2.ogg" -> R.raw.alarm2
+            "alert.ogg" -> R.raw.alert
+            "warning_alarm.ogg" -> R.raw.warning_alarm
+            "sensor_alarm.ogg" -> R.raw.sensor_alarm
+            "ambulance.ogg" -> R.raw.ambulance
+            "police.ogg" -> R.raw.police
+            "siren.ogg" -> R.raw.siren
+            "siren2.ogg" -> R.raw.siren2
+            else -> R.raw.warning_alarm
         }
     }
 

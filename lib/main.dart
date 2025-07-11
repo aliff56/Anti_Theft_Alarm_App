@@ -12,6 +12,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:wallpaper_manager_flutter/wallpaper_manager_flutter.dart';
 import 'package:animated_check/animated_check.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:http/http.dart' as http;
+import 'wallpaper_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -404,66 +407,136 @@ class _AnimatedArmButtonState extends State<_AnimatedArmButton>
 }
 
 // WallpapersScreen implementation
-class WallpapersScreen extends StatelessWidget {
+class WallpapersScreen extends StatefulWidget {
   const WallpapersScreen({Key? key}) : super(key: key);
 
-  // List of wallpaper asset paths
-  List<String> get wallpaperAssets => [
-    'assets/wallpapers/1.jpg',
-    'assets/wallpapers/2.jpg',
-    'assets/wallpapers/3.jpg',
-    'assets/wallpapers/4.jpg',
-    'assets/wallpapers/5.jpg',
-    'assets/wallpapers/6.jpg',
-    'assets/wallpapers/7.jpg',
-    'assets/wallpapers/8.jpg',
-    'assets/wallpapers/9.jpg',
-    'assets/wallpapers/10.jpg',
-  ];
+  @override
+  State<WallpapersScreen> createState() => _WallpapersScreenState();
+}
+
+class _WallpapersScreenState extends State<WallpapersScreen> {
+  List<Wallpaper> _wallpapers = [];
+  bool _isLoading = true;
+  bool _hasError = false;
+  final int _perPage = 16;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadWallpapers();
+  }
+
+  Future<void> _loadWallpapers() async {
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+    });
+
+    try {
+      final wallpapers = await WallpaperService.getWallpapers(
+        page: 1,
+        perPage: _perPage,
+      );
+      setState(() {
+        _wallpapers = wallpapers;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Choose Wallpaper')),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(12),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          mainAxisExtent: 240, // Increased height for each item
-        ),
-        itemCount: wallpaperAssets.length,
-        itemBuilder: (context, index) {
-          final asset = wallpaperAssets[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => WallpaperPreviewScreen(
-                    assetPath: asset,
-                    parentContext: context,
+      body: _isLoading
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Loading wallpapers...'),
+                ],
+              ),
+            )
+          : _hasError
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Failed to load wallpapers',
+                    style: TextStyle(fontSize: 18),
                   ),
-                ),
-              );
-            },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.asset(asset, fit: BoxFit.cover),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: _loadWallpapers,
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            )
+          : _wallpapers.isEmpty
+          ? const Center(child: Text('No wallpapers available'))
+          : GridView.builder(
+              padding: const EdgeInsets.all(12),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                mainAxisExtent: 240,
+              ),
+              itemCount: _wallpapers.length,
+              itemBuilder: (context, index) {
+                final wallpaper = _wallpapers[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => WallpaperPreviewScreen(
+                          wallpaper: wallpaper,
+                          parentContext: context,
+                        ),
+                      ),
+                    );
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: CachedNetworkImage(
+                      imageUrl: wallpaper.url,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey[800],
+                        child: const Center(child: CircularProgressIndicator()),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.grey[800],
+                        child: const Center(
+                          child: Icon(Icons.error, color: Colors.red),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
     );
   }
 }
 
 class WallpaperPreviewScreen extends StatelessWidget {
-  final String assetPath;
+  final Wallpaper wallpaper;
   final BuildContext parentContext;
   const WallpaperPreviewScreen({
     Key? key,
-    required this.assetPath,
+    required this.wallpaper,
     required this.parentContext,
   }) : super(key: key);
 
@@ -513,28 +586,33 @@ class WallpaperPreviewScreen extends StatelessWidget {
 
   Future<void> _setWallpaper(BuildContext context, int location) async {
     try {
-      final byteData = await rootBundle.load(assetPath);
-      final bytes = byteData.buffer.asUint8List();
-      final tempDir = await getTemporaryDirectory();
-      final file = await File('${tempDir.path}/temp_wallpaper.jpg').create();
-      await file.writeAsBytes(bytes);
-      final wallpaperManager = WallpaperManagerFlutter();
-      bool result = await wallpaperManager.setWallpaper(file, location);
-      if (context.mounted && result) {
-        // Pop the preview screen first
-        Navigator.of(context).pop();
-        // Show the dialog on the parent screen after the pop
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _showConfirmationDialog(parentContext);
-        });
-      } else if (context.mounted && !result) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to set wallpaper.'),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.only(bottom: 24, left: 24, right: 24),
-          ),
-        );
+      // Download the image from URL
+      final response = await http.get(Uri.parse(wallpaper.url));
+      if (response.statusCode == 200) {
+        final bytes = response.bodyBytes;
+        final tempDir = await getTemporaryDirectory();
+        final file = await File('${tempDir.path}/temp_wallpaper.jpg').create();
+        await file.writeAsBytes(bytes);
+        final wallpaperManager = WallpaperManagerFlutter();
+        bool result = await wallpaperManager.setWallpaper(file, location);
+        if (context.mounted && result) {
+          // Pop the preview screen first
+          Navigator.of(context).pop();
+          // Show the dialog on the parent screen after the pop
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _showConfirmationDialog(parentContext);
+          });
+        } else if (context.mounted && !result) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to set wallpaper.'),
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.only(bottom: 24, left: 24, right: 24),
+            ),
+          );
+        }
+      } else {
+        throw Exception('Failed to download image: ${response.statusCode}');
       }
     } catch (e) {
       if (context.mounted) {
@@ -612,12 +690,21 @@ class WallpaperPreviewScreen extends StatelessWidget {
             child: InteractiveViewer(
               minScale: 1,
               maxScale: 5,
-              child: Image.asset(
-                assetPath,
+              child: CachedNetworkImage(
+                imageUrl: wallpaper.url,
                 fit: BoxFit.contain,
                 width: double.infinity,
                 height: double.infinity,
-                alignment: Alignment.center,
+                placeholder: (context, url) => Container(
+                  color: Colors.black,
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  color: Colors.black,
+                  child: const Center(
+                    child: Icon(Icons.error, color: Colors.red, size: 48),
+                  ),
+                ),
               ),
             ),
           ),

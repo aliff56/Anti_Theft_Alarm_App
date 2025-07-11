@@ -12,13 +12,29 @@ class AudioOption {
 }
 
 final List<AudioOption> audioOptions = [
-  AudioOption('alarm.wav', 'Alarm', Icons.alarm, 'Classic alarm sound.'),
-  AudioOption('alarm2.flac', 'Alarm 2', Icons.alarm_on, 'Alternative alarm.'),
-  AudioOption('alert.wav', 'Alert', Icons.warning, 'Alert sound.'),
-  AudioOption('bark.wav', 'Dog Bark', Icons.pets, 'Dog barking.'),
-  AudioOption('police.mp3', 'Police', Icons.local_police, 'Police siren.'),
-  AudioOption('siren.wav', 'Siren', Icons.notifications_active, 'Loud siren.'),
-  AudioOption('siren2.wav', 'Siren 2', Icons.notifications, 'Another siren.'),
+  AudioOption('alarm2.ogg', 'Alarm', Icons.alarm_on, 'Alternative alarm.'),
+  AudioOption('alert.ogg', 'Alert', Icons.warning, 'Alert sound.'),
+  AudioOption(
+    'warning_alarm.ogg',
+    'Warning Alarm',
+    Icons.warning_amber,
+    'Loud warning alarm.',
+  ),
+  AudioOption(
+    'sensor_alarm.ogg',
+    'Sensor Alarm',
+    Icons.sensors,
+    'Sensor triggered alarm.',
+  ),
+  AudioOption(
+    'ambulance.ogg',
+    'Ambulance',
+    Icons.local_hospital,
+    'Ambulance siren.',
+  ),
+  AudioOption('police.ogg', 'Police', Icons.local_police, 'Police siren.'),
+  AudioOption('siren.ogg', 'Siren', Icons.notifications_active, 'Loud siren.'),
+  AudioOption('siren2.ogg', 'Siren 2', Icons.notifications, 'Another siren.'),
 ];
 
 class AudioSelectionGrid extends StatelessWidget {
@@ -43,19 +59,18 @@ class AudioSelectionGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     // Build rows of 3 cards each
     List<Widget> rows = [];
-    for (int i = 0; i < audioOptions.length; i += 3) {
-      final rowOptions = audioOptions.skip(i).take(3).toList();
+    for (int i = 0; i < audioOptions.length; i += 2) {
+      final rowOptions = audioOptions.skip(i).take(2).toList();
       rows.add(
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: rowOptions.map((option) {
               final isApplied = option.fileName == appliedAudio;
-              return SizedBox(
-                width: 120,
+              return Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(
@@ -75,45 +90,45 @@ class AudioSelectionGrid extends StatelessWidget {
                       elevation: 4,
                       color: Theme.of(context).cardColor,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: Stack(
                         children: [
                           Container(
-                            height: 140,
-                            padding: const EdgeInsets.all(12),
+                            height: 180,
+                            padding: const EdgeInsets.all(16),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
                                   option.icon,
-                                  size: 40,
+                                  size: 48,
                                   color: Colors.tealAccent,
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: 12),
                                 Center(
                                   child: Text(
                                     option.label,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
-                                      fontSize: 13,
+                                      fontSize: 16,
                                     ),
-                                    maxLines: 1,
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 8),
                                 Center(
                                   child: Text(
                                     option.description,
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
-                                      fontSize: 11,
+                                      fontSize: 13,
                                       color: Colors.white70,
                                     ),
-                                    maxLines: 2,
+                                    maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
@@ -122,8 +137,8 @@ class AudioSelectionGrid extends StatelessWidget {
                           ),
                           if (isApplied)
                             Positioned(
-                              top: 8,
-                              right: 8,
+                              top: 10,
+                              right: 10,
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: Colors.tealAccent,
@@ -137,11 +152,11 @@ class AudioSelectionGrid extends StatelessWidget {
                                   ],
                                 ),
                                 child: const Padding(
-                                  padding: EdgeInsets.all(4.0),
+                                  padding: EdgeInsets.all(5.0),
                                   child: Icon(
                                     Icons.check,
                                     color: Colors.black,
-                                    size: 12,
+                                    size: 14,
                                   ),
                                 ),
                               ),
