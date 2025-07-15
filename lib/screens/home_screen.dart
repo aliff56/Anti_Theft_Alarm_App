@@ -1,23 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 import '../audio_selection.dart';
 import '../widgets/custom_switch.dart';
-import '../widgets/animated_arm_button.dart';
 import '../screens/settings_screen.dart';
 import '../screens/activation_screens.dart' as activation;
 import '../screens/wallpapers_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:wallpaper_manager_flutter/wallpaper_manager_flutter.dart';
-import 'package:animated_check/animated_check.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:http/http.dart' as http;
-import '../wallpaper_service.dart';
-import '../splash_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import '../theme.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -572,30 +565,37 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 18,
-                        horizontal: 18,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: kCardShadow,
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white,
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text(
-                            'Explore Stunning Wallpapers',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 18,
+                          horizontal: 18,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text(
+                              'Explore Stunning Wallpapers',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
                             ),
-                          ),
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.black,
-                            size: 22,
-                          ),
-                        ],
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.black,
+                              size: 22,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

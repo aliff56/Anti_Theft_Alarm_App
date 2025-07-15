@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../theme.dart';
 
 class AlarmEnabledScreen extends StatelessWidget {
   const AlarmEnabledScreen({Key? key}) : super(key: key);
@@ -138,24 +139,23 @@ class DeactivatedScreen extends StatelessWidget {
               right: 0,
               bottom: 32,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 0),
                 child: SizedBox(
                   width: double.infinity,
-                  height: 56,
                   child: ElevatedButton(
-                    onPressed: onBackToHome,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF264653),
+                      foregroundColor: Colors.black,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      textStyle: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 20,
-                      ),
-                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
+                    onPressed: onBackToHome,
                     child: const Text('Back to Home'),
                   ),
                 ),

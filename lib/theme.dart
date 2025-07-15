@@ -49,3 +49,11 @@ ThemeData getAppTheme() {
     ),
   );
 }
+
+const List<BoxShadow> kCardShadow = [
+  BoxShadow(
+    color: Colors.black26, // fallback for dark mode
+    blurRadius: 6,
+    offset: Offset(0, 8),
+  ),
+];

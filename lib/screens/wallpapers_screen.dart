@@ -350,20 +350,24 @@ class WallpaperPreviewScreen extends StatelessWidget {
             bottom: 0,
             child: Padding(
               padding: const EdgeInsets.all(24.0),
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.wallpaper),
-                label: const Text('Set as Wallpaper'),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(56),
-                  textStyle: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFF213B44),
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  onPressed: () => _showSetOptions(context),
+                  child: const Text('Set as Wallpaper'),
                 ),
-                onPressed: () => _showSetOptions(context),
               ),
             ),
           ),

@@ -7,7 +7,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:math' as math;
 import 'package:google_fonts/google_fonts.dart';
-import 'theme.dart';
+import 'widgets/custom_switch.dart';
 
 class AudioOption {
   final String fileName;
@@ -708,19 +708,23 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage>
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    padding: const EdgeInsets.symmetric(vertical: 30),
                     textStyle: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 24,
+                      fontSize: 18,
                     ),
                     elevation: 0,
                   ),
                   child: Text(
                     'Set this sound as ringtone',
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 22,
+                    ),
                   ),
                 ),
               ),
+              const SizedBox(height: 10),
             ],
           ),
         ),
@@ -788,14 +792,12 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage>
             ),
           ),
           Transform.scale(
-            scale: 1.3,
-            child: Switch(
+            scale: 1.0,
+            child: CustomSwitch(
               value: value,
               onChanged: onChanged,
-              activeColor: Color(0xFF213B44),
-              activeTrackColor: Color(0xFF213B44),
-              inactiveTrackColor: Colors.grey.shade300,
-              thumbColor: MaterialStatePropertyAll(Colors.white),
+              width: 52,
+              height: 32,
             ),
           ),
         ],

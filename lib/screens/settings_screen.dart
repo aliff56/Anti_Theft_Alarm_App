@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:io';
 import '../widgets/custom_switch.dart';
 import '../widgets/rate_us_dialog.dart';
 import '../widgets/exit_confirm_dialog.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
+import '../theme.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -18,6 +19,163 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _timerEnabled = false;
   bool _autoCloseEnabled = false;
   TimeOfDay _selectedTime = const TimeOfDay(hour: 9, minute: 0);
+  static const platform = MethodChannel('antitheft_service');
+
+  Future<bool> _hasExactAlarmPermission() async {
+    if (!Platform.isAndroid) return true;
+    try {
+      final bool granted = await platform.invokeMethod(
+        'canScheduleExactAlarms',
+      );
+      return granted;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> _requestExactAlarmPermission() async {
+    if (!Platform.isAndroid) return;
+    try {
+      await platform.invokeMethod('openExactAlarmSettings');
+    } catch (_) {}
+  }
+
+  Future<void> _handleTimerToggle(bool v) async {
+    if (v) {
+      final hasPermission = await _hasExactAlarmPermission();
+      if (hasPermission) {
+        setState(() => _timerEnabled = true);
+        await _saveSettings();
+        return;
+      }
+      final goToSettings = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: 320,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Permission Required',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    color: Color(0xFF213B44),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'To use the timer, please allow "Schedule exact alarm" for this app in system settings.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    color: Color(0xFF213B44),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF213B44),
+                          foregroundColor: Colors.white,
+                          textStyle: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: EdgeInsets.zero,
+                          alignment: Alignment.center,
+                        ),
+                        onPressed: () async {
+                          Navigator.pop(ctx, true);
+                          await _requestExactAlarmPermission();
+                        },
+                        child: const Text('Open Settings'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Color(0xFF213B44),
+                          side: const BorderSide(
+                            color: Color(0xFF213B44),
+                            width: 2,
+                          ),
+                          textStyle: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: EdgeInsets.zero,
+                          alignment: Alignment.center,
+                        ),
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text('Cancel'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      // After returning from settings, check again
+      if (goToSettings == true) {
+        final granted = await _hasExactAlarmPermission();
+        if (granted) {
+          setState(() => _timerEnabled = true);
+          await _saveSettings();
+          return;
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Permission not granted. Timer not enabled.'),
+            ),
+          );
+          setState(() => _timerEnabled = false);
+          return;
+        }
+      } else {
+        setState(() => _timerEnabled = false);
+        return;
+      }
+    }
+    setState(() => _timerEnabled = false);
+    await _saveSettings();
+  }
 
   @override
   void initState() {
@@ -43,7 +201,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await prefs.setInt('auto_disarm_minute', _selectedTime.minute);
     // Schedule/cancel native alarm on Android
     if (Platform.isAndroid) {
-      const platform = MethodChannel('antitheft_service');
       if (_timerEnabled) {
         await platform.invokeMethod('scheduleAutoDisarm', {
           'hour': _selectedTime.hour,
@@ -107,7 +264,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.alarm, color: Color(0xFF23414D)),
+                          Image.asset(
+                            'assets/icons/timer.png',
+                            width: 28,
+                            height: 28,
+                          ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
@@ -122,8 +283,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           CustomSwitch(
                             value: _timerEnabled,
                             onChanged: (v) async {
-                              setState(() => _timerEnabled = v);
-                              await _saveSettings();
+                              await _handleTimerToggle(v);
                             },
                           ),
                         ],
@@ -247,7 +407,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.logout, color: Color(0xFF23414D)),
+                      Image.asset(
+                        'assets/icons/auto_exit.png',
+                        width: 26,
+                        height: 26,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -319,35 +483,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _settingsTile(String label, IconData icon, {IconData? leading}) {
+    final noShadowLabels = [
+      'Share App',
+      'Rate us',
+      'Feedback',
+      'Share with friends',
+      'Exit',
+    ];
     return Column(
       children: [
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: leading != null
-              ? Icon(leading, color: const Color(0xFF23414D))
-              : null,
-          title: Text(
-            label,
-            style: GoogleFonts.poppins(
-              color: Color(0xFF23414D),
-              fontWeight: FontWeight.w600,
-              fontSize: 17,
+        Card(
+          color: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              boxShadow: noShadowLabels.contains(label) ? [] : kCardShadow,
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+            ),
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: leading != null
+                  ? Icon(leading, color: const Color(0xFF23414D))
+                  : null,
+              title: Text(
+                label,
+                style: GoogleFonts.poppins(
+                  color: Color(0xFF23414D),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 17,
+                ),
+              ),
+              trailing: Icon(icon, color: const Color(0xFF23414D)),
+              onTap: label == 'Rate us'
+                  ? () => showDialog(
+                      context: context,
+                      builder: (context) => const RateUsDialog(),
+                    )
+                  : label == 'Exit'
+                  ? () => showDialog(
+                      context: context,
+                      builder: (context) => const ExitConfirmDialog(),
+                    )
+                  : () {},
             ),
           ),
-          trailing: Icon(icon, color: const Color(0xFF23414D)),
-          onTap: label == 'Rate us'
-              ? () => showDialog(
-                  context: context,
-                  builder: (context) => const RateUsDialog(),
-                )
-              : label == 'Exit'
-              ? () => showDialog(
-                  context: context,
-                  builder: (context) => const ExitConfirmDialog(),
-                )
-              : () {},
         ),
-        if (label != 'Exit') const Divider(height: 1, color: Color(0xFFE0E0E0)),
+        if (!noShadowLabels.contains(label))
+          const Divider(height: 1, color: Color(0xFFE0E0E0)),
       ],
     );
   }
