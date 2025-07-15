@@ -21,13 +21,18 @@ import androidx.core.app.ActivityCompat
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.provider.Settings
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "antitheft_service"
     private var pendingRingtoneFileName: String? = null
     private var pendingRingtoneResult: MethodChannel.Result? = null
     companion object {
-        var selectedAudioFile: String = "alarm.wav"
+        var selectedAudioFile: String = "alarm2.ogg"
         var selectedLoop: String = "infinite"
         var selectedVibrate: Boolean = false
         var selectedFlash: Boolean = false
@@ -64,7 +69,7 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
                 "setAudio" -> {
-                    val fileName = call.argument<String>("fileName") ?: "alarm.wav"
+                    val fileName = call.argument<String>("fileName") ?: "alarm2.ogg"
                     val loop = call.argument<String>("loop") ?: "infinite"
                     val vibrate = call.argument<Boolean>("vibrate") ?: false
                     val flash = call.argument<Boolean>("flash") ?: false
@@ -97,7 +102,7 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
                 "setRingtone" -> {
-                    val fileName = call.argument<String>("fileName") ?: "alarm.wav"
+                    val fileName = call.argument<String>("fileName") ?: "alarm2.ogg"
                     // Check and request permissions only when setting ringtone
                     val writeSettingsGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) android.provider.Settings.System.canWrite(this) else true
                     // Only check WRITE_EXTERNAL_STORAGE for Android 9 and below
@@ -156,10 +161,80 @@ class MainActivity : FlutterActivity() {
                     }
                     result.success(null)
                 }
+                "scheduleAutoDisarm" -> {
+                    val hour = call.argument<Int>("hour") ?: 9
+                    val minute = call.argument<Int>("minute") ?: 0
+                    scheduleAutoDisarmAlarm(hour, minute)
+                    result.success(null)
+                }
+                "cancelAutoDisarm" -> {
+                    cancelAutoDisarmAlarm()
+                    result.success(null)
+                }
+                "canScheduleExactAlarms" -> {
+                    result.success(canScheduleExactAlarms())
+                }
+                "openExactAlarmSettings" -> {
+                    openExactAlarmSettings()
+                    result.success(null)
+                }
+                "serviceIsRunning" -> {
+                    val manager = getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+                    val running = manager.getRunningServices(Int.MAX_VALUE)
+                        .any { it.service.className == AntiTheftService::class.java.name }
+                    result.success(running)
+                }
                 else -> result.notImplemented()
             }
         }
     }
 
-    // Remove pendingRingtoneFileName and onRequestPermissionsResult logic, as permission is now handled in Dart
+    private fun scheduleAutoDisarmAlarm(hour: Int, minute: Int) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AutoDisarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val now = java.util.Calendar.getInstance()
+        val target = java.util.Calendar.getInstance().apply {
+            set(java.util.Calendar.HOUR_OF_DAY, hour)
+            set(java.util.Calendar.MINUTE, minute)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+            if (before(now)) add(java.util.Calendar.DATE, 1)
+        }
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, target.timeInMillis, pendingIntent)
+    }
+
+    private fun cancelAutoDisarmAlarm() {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AutoDisarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.cancel(pendingIntent)
+    }
+
+    private fun canScheduleExactAlarms(): Boolean {
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.canScheduleExactAlarms()
+        } else {
+            true
+        }
+    }
+
+    private fun openExactAlarmSettings() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+        }
+    }
+}
+
+class AutoDisarmReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        val serviceIntent = Intent(context, AntiTheftService::class.java)
+        serviceIntent.action = "DISARM"
+        context.startService(serviceIntent)
+        // Optionally, notify Flutter via method channel if app is running
+        MainActivity.methodChannel?.invokeMethod("disarmedByNotification", null)
+    }
 }
