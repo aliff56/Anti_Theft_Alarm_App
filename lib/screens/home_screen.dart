@@ -218,7 +218,12 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
+            icon: Image.asset(
+              'assets/icons/settings.png',
+              width: 26,
+              height: 26,
+              color: Colors.white,
+            ),
             onPressed: () {
               Navigator.of(
                 context,

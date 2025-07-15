@@ -443,7 +443,7 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage>
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: const Color(0xFF203A43),
+        backgroundColor: const Color(0xFF213B44),
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
       ),
@@ -581,7 +581,7 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage>
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               // Volume
               Text(
                 'Volume:',
@@ -634,7 +634,7 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage>
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               // Duration
               Text(
                 'Duration:',
@@ -668,7 +668,7 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage>
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               // Flash/Vibrate
               Container(
                 decoration: BoxDecoration(
@@ -724,7 +724,7 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage>
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 14),
             ],
           ),
         ),

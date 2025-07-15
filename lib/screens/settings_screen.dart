@@ -224,7 +224,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF23414D),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF23414D),
+        backgroundColor: const Color(0xFF213B44),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
