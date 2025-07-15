@@ -41,6 +41,7 @@ dependencies:
   animated_check: ^1.0.0
   http: ^1.1.0
   cached_network_image: ^3.3.0
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +53,12 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -80,7 +87,6 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
@@ -96,4 +102,27 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 
   assets:
-    - assets/sounds/
+    - assets/icon/app_icon.png
+    - assets/icons/activate.png
+    - assets/icons/alarm.png
+    - assets/icons/alert.png
+    - assets/icons/ambulance.png
+    - assets/icons/police.png
+    - assets/icons/sensor_alarm.png
+    - assets/icons/siren.png
+    - assets/icons/siren2.png
+    - assets/icons/tick.png
+    - assets/icons/warning.png
+    - assets/icons/infinity.png
+    - assets/icons/volume.png
+    - assets/icons/flash.png
+    - assets/icons/vibrate.png
+    - assets/icons/deactivated.png
+    - assets/sounds/alarm2.ogg
+    - assets/sounds/alert.ogg
+    - assets/sounds/ambulance.ogg
+    - assets/sounds/police.ogg
+    - assets/sounds/sensor_alarm.ogg
+    - assets/sounds/siren.ogg
+    - assets/sounds/siren2.ogg
+    - assets/sounds/warning_alarm.ogg
