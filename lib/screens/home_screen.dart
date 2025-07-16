@@ -11,6 +11,7 @@ import '../screens/wallpapers_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import '../theme.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -212,9 +213,9 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF213B44), // Set app bar color
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Anti-Theft Alarm',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 18),
         ),
         actions: [
           IconButton(
@@ -334,10 +335,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Text(
                   _armed ? 'Tap to Deactivate' : 'Tap to Activate',
-                  style: const TextStyle(
+                  style: GoogleFonts.poppins(
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
                     height: 1.1,
                   ),
                 ),
@@ -360,12 +361,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Text(
+                          Text(
                             'Pick Pocket Mode',
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Color(0xFF203A43),
-                              fontWeight: FontWeight.w700,
-                              fontSize: 22,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 18,
                               letterSpacing: 0.2,
                             ),
                           ),
@@ -387,11 +388,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     Text(
                       'Alert Sounds',
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                        decoration: TextDecoration.underline,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
                         decorationColor: Colors.white,
                         decorationThickness: 2,
                         letterSpacing: 0.2,
@@ -424,7 +424,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           iconAsset = 'assets/icons/ambulance.png';
                           break;
                         case 'warning_alarm.ogg':
-                          iconAsset = 'assets/icons/warning.png';
+                          iconAsset = 'assets/icons/warning2.png';
                           break;
                         case 'police.ogg':
                           iconAsset = 'assets/icons/police.png';
@@ -522,10 +522,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                     const SizedBox(height: 12),
                                     Text(
                                       option.label,
-                                      style: const TextStyle(
-                                        color: Color(0xFF203A43),
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
+                                      style: GoogleFonts.poppins(
+                                        color: Color(0xFF1A2A30),
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14,
                                       ),
                                     ),
                                   ],
@@ -566,41 +566,45 @@ class _MyHomePageState extends State<MyHomePage> {
                       MaterialPageRoute(builder: (_) => WallpapersScreen()),
                     );
                   },
-                  child: Card(
-                    color: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      boxShadow: kCardShadow,
                       borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        boxShadow: kCardShadow,
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0xFF66BB6A), Color(0xFF43A047)],
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 18,
-                          horizontal: 18,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
-                              'Explore Stunning Wallpapers',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 18,
+                        horizontal: 18,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Explore Stunning Wallpapers',
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 32,
+                            width: 32,
+                            child: Center(
+                              child: Image.asset(
+                                'assets/icons/stripe2.png',
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.contain,
                               ),
                             ),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              color: Colors.black,
-                              size: 22,
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

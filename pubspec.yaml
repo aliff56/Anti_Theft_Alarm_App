@@ -107,17 +107,28 @@ flutter:
     - assets/icons/alarm.png
     - assets/icons/alert.png
     - assets/icons/ambulance.png
+    - assets/icons/auto_exit.png
+    - assets/icons/deactivated.png
+    - assets/icons/Face with Cold Sweat Emoji.png
+    - assets/icons/flash.png
+    - assets/icons/Heart Eyes Emoji.png
+    - assets/icons/infinity.png
+    - assets/icons/Neutral Face Emoji.png
     - assets/icons/police.png
     - assets/icons/sensor_alarm.png
+    - assets/icons/settings.png
     - assets/icons/siren.png
     - assets/icons/siren2.png
+    - assets/icons/Smiling Face Emoji with Blushed Cheeks.png
     - assets/icons/tick.png
-    - assets/icons/warning.png
-    - assets/icons/infinity.png
-    - assets/icons/volume.png
-    - assets/icons/flash.png
+    - assets/icons/timer.png
+    - assets/icons/Very Sad Emoji.png
     - assets/icons/vibrate.png
-    - assets/icons/deactivated.png
+    - assets/icons/volume.png
+    - assets/icons/warning.png
+    - assets/icons/warning2.png
+    - assets/icons/stripe.png
+    - assets/icons/stripe2.png
     - assets/sounds/alarm2.ogg
     - assets/sounds/alert.ogg
     - assets/sounds/ambulance.ogg
@@ -126,11 +137,3 @@ flutter:
     - assets/sounds/siren.ogg
     - assets/sounds/siren2.ogg
     - assets/sounds/warning_alarm.ogg
-    - assets/icons/Neutral Face Emoji.png
-    - assets/icons/Heart Eyes Emoji.png
-    - assets/icons/Smiling Face Emoji with Blushed Cheeks.png
-    - assets/icons/Face with Cold Sweat Emoji.png
-    - assets/icons/Very Sad Emoji.png
-    - assets/icons/timer.png
-    - assets/icons/auto_exit.png
-    - assets/icons/settings.png

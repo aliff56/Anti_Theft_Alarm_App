@@ -8,6 +8,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:math' as math;
 import 'package:google_fonts/google_fonts.dart';
 import 'widgets/custom_switch.dart';
+import '../theme.dart';
 
 class AudioOption {
   final String fileName;
@@ -411,7 +412,7 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage>
         iconAsset = 'assets/icons/ambulance.png';
         break;
       case 'warning_alarm.ogg':
-        iconAsset = 'assets/icons/warning.png';
+        iconAsset = 'assets/icons/warning2.png';
         break;
       case 'police.ogg':
         iconAsset = 'assets/icons/police.png';
@@ -434,298 +435,358 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage>
       default:
         iconAsset = null;
     }
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Sound',
-          style: GoogleFonts.urbanist(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: const Color(0xFF213B44),
-        iconTheme: const IconThemeData(color: Colors.white),
-        elevation: 0,
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF2C5364), Color(0xFF203A43)],
-          ),
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+    return WillPopScope(
+      onWillPop: () async {
+        await _player.stop();
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          leadingWidth: 0,
+          titleSpacing: 0,
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Sound Card
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 24,
-                  horizontal: 8,
-                ),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 90,
-                      child: Center(
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            if (_isPlaying)
-                              AnimatedBuilder(
-                                animation: _waveController,
-                                builder: (context, child) {
-                                  return CustomPaint(
-                                    painter: _DualPulseCirclePainter(
-                                      _waveController.value,
-                                    ),
-                                    size: const Size(90, 90),
-                                  );
-                                },
-                              ),
-                            iconAsset != null
-                                ? Image.asset(iconAsset, width: 80, height: 80)
-                                : Icon(
-                                    widget.option.icon,
-                                    size: 52,
-                                    color: Colors.tealAccent,
-                                  ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 100,
-                          height: 36,
-                          child: ElevatedButton(
-                            onPressed: _preview,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF203A43),
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              elevation: 4,
-                              shadowColor: Colors.black.withOpacity(0.18),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 0,
-                                vertical: 0,
-                              ),
-                              textStyle: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            child: Text(
-                              _isPlaying ? 'Stop' : 'Play',
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        SizedBox(
-                          width: 100,
-                          height: 36,
-                          child: ElevatedButton(
-                            onPressed: _isCurrentApplied
-                                ? () {}
-                                : () {
-                                    widget.onApply?.call(
-                                      widget.option,
-                                      _selectedLoop,
-                                      _vibrate,
-                                      _flash,
-                                    );
-                                    Navigator.pop(context);
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF203A43),
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              elevation: 4,
-                              shadowColor: Colors.black.withOpacity(0.18),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 0,
-                                vertical: 0,
-                              ),
-                              textStyle: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            child: Text(
-                              _isCurrentApplied ? 'Applied' : 'Apply',
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () async {
+                  await _player.stop();
+                  Navigator.of(context).pop();
+                },
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
-              const SizedBox(height: 20),
-              // Volume
+              const SizedBox(width: 2),
               Text(
-                'Volume:',
-                style: GoogleFonts.urbanist(
+                'Sound',
+                style: GoogleFonts.poppins(
                   color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
-                  decoration: TextDecoration.underline,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 8),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 16,
-                ),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      'assets/icons/volume.png',
-                      width: 36,
-                      height: 36,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: SliderTheme(
-                        data: SliderTheme.of(context).copyWith(
-                          trackHeight: 5,
-                          activeTrackColor: const Color(0xFF203A43),
-                          inactiveTrackColor: Colors.grey.shade300,
-                          thumbColor: const Color(0xFF203A43),
-                          overlayColor: const Color(0x33213A43),
-                          thumbShape: const _ThumbWithDotShape(),
-                          overlayShape: const RoundSliderOverlayShape(
-                            overlayRadius: 20,
-                          ),
-                        ),
-                        child: Slider(
-                          value: _systemVolume,
-                          min: 0,
-                          max: 1,
-                          onChanged: (value) => _setSystemVolume(value),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Duration
-              Text(
-                'Duration:',
-                style: GoogleFonts.urbanist(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 12,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _durationButton('20s'),
-                    const SizedBox(width: 12),
-                    _durationButton('1m'),
-                    const SizedBox(width: 12),
-                    _durationButton('2m'),
-                    const SizedBox(width: 12),
-                    _durationButton('infinite', isIcon: true),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Flash/Vibrate
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 12,
-                ),
-                child: Column(
-                  children: [
-                    _toggleRow(
-                      iconAsset: 'assets/icons/flash.png',
-                      label: 'Flash on alert',
-                      value: _flash,
-                      onChanged: (val) => setState(() => _flash = val),
-                    ),
-                    _toggleRow(
-                      iconAsset: 'assets/icons/vibrate.png',
-                      label: 'Vibrate on alert',
-                      value: _vibrate,
-                      onChanged: (val) => setState(() => _vibrate = val),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              // Set as ringtone
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _setAsRingtone,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Color(0xFF264653),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 30),
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    'Set this sound as ringtone',
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 22,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 14),
             ],
+          ),
+          backgroundColor: const Color(0xFF213B44),
+          iconTheme: const IconThemeData(color: Colors.white),
+          elevation: 0,
+        ),
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF2C5364), Color(0xFF203A43)],
+            ),
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Sound Card
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 24,
+                    horizontal: 8,
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 90,
+                        child: Center(
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              if (_isPlaying)
+                                AnimatedBuilder(
+                                  animation: _waveController,
+                                  builder: (context, child) {
+                                    return CustomPaint(
+                                      painter: _DualPulseCirclePainter(
+                                        _waveController.value,
+                                      ),
+                                      size: const Size(90, 90),
+                                    );
+                                  },
+                                ),
+                              iconAsset != null
+                                  ? Image.asset(
+                                      iconAsset,
+                                      width: 80,
+                                      height: 80,
+                                    )
+                                  : Icon(
+                                      widget.option.icon,
+                                      size: 52,
+                                      color: Colors.tealAccent,
+                                    ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 100,
+                            height: 36,
+                            child: ElevatedButton(
+                              onPressed: _preview,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF203A43),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                elevation: 4,
+                                shadowColor: Colors.black.withOpacity(0.18),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 0,
+                                  vertical: 0,
+                                ),
+                                textStyle: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              child: Text(
+                                _isPlaying ? 'Stop' : 'Play',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          SizedBox(
+                            width: 100,
+                            height: 36,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (_isCurrentApplied) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Already Applied!',
+                                        style: TextStyle(
+                                          color: Color(0xFF203A43),
+                                        ),
+                                      ),
+                                      backgroundColor: Colors.white,
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                } else {
+                                  widget.onApply?.call(
+                                    widget.option,
+                                    _selectedLoop,
+                                    _vibrate,
+                                    _flash,
+                                  );
+                                  Navigator.pop(context);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _isCurrentApplied
+                                    ? Colors.grey
+                                    : const Color(0xFF203A43),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                elevation: 4,
+                                shadowColor: Colors.black.withOpacity(0.18),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 0,
+                                  vertical: 0,
+                                ),
+                                textStyle: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              child: Text(
+                                'Apply',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Volume
+                Text(
+                  'Volume:',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 16,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Image.asset(
+                          'assets/icons/volume.png',
+                          width: 28,
+                          height: 28,
+                        ),
+                      ),
+                      Flexible(
+                        child: SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            trackHeight: 5,
+                            activeTrackColor: const Color(0xFF203A43),
+                            inactiveTrackColor: Colors.grey.shade300,
+                            thumbColor: const Color(0xFF203A43),
+                            overlayColor: const Color(0x33213A43),
+                            thumbShape: const _ThumbWithDotShape(),
+                            overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 20,
+                            ),
+                            // Custom track shape to remove left/right padding
+                            trackShape: const RectangularSliderTrackShape(),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 0),
+                            child: Slider(
+                              value: _systemVolume,
+                              min: 0,
+                              max: 1,
+                              onChanged: (value) => _setSystemVolume(value),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Duration
+                Text(
+                  'Duration:',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _durationButton('20s'),
+                      const SizedBox(width: 12),
+                      _durationButton('1m'),
+                      const SizedBox(width: 12),
+                      _durationButton('2m'),
+                      const SizedBox(width: 12),
+                      _durationButton('infinite', isIcon: true),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Flash/Vibrate
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                  child: Column(
+                    children: [
+                      _toggleRow(
+                        iconAsset: 'assets/icons/flash.png',
+                        label: 'Flash on alert',
+                        value: _flash,
+                        onChanged: (val) => setState(() => _flash = val),
+                      ),
+                      _toggleRow(
+                        iconAsset: 'assets/icons/vibrate.png',
+                        label: 'Vibrate on alert',
+                        value: _vibrate,
+                        onChanged: (val) => setState(() => _vibrate = val),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // Set as ringtone
+                Center(
+                  child: Container(
+                    width: 250,
+                    decoration: BoxDecoration(
+                      boxShadow: kCardShadow,
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0xFF66BB6A), Color(0xFF43A047)],
+                      ),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(16),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: _setAsRingtone,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Set as ringtone',
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 80),
+              ],
+            ),
           ),
         ),
       ),
@@ -760,9 +821,9 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage>
             : Text(
                 label,
                 style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                   color: selected ? Colors.white : const Color(0xFF203A43),
-                  fontSize: 15,
+                  fontSize: 13,
                 ),
               ),
       ),
@@ -780,14 +841,14 @@ class _AudioOptionDetailPageState extends State<AudioOptionDetailPage>
       child: Row(
         children: [
           Image.asset(iconAsset, width: 28, height: 28),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               label,
               style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 color: Color(0xFF23414D),
-                fontSize: 22,
+                fontSize: 14,
               ),
             ),
           ),
@@ -906,8 +967,8 @@ class DeactivatedScreen extends StatelessWidget {
                 Text(
                   'Anti-theft alert feature deactivated',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.urbanist(
-                    fontWeight: FontWeight.bold,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
                     fontSize: 20,
                     color: Colors.white,
                   ),

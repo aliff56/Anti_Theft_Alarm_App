@@ -29,33 +29,39 @@ class _WallpapersScreenState extends State<WallpapersScreen> {
       _wallpapers = _wallpapersCache!;
       _isLoading = false;
       _hasError = false;
-      setState(() {});
+      if (mounted) setState(() {});
     } else {
       _loadWallpapers();
     }
   }
 
   Future<void> _loadWallpapers() async {
-    setState(() {
-      _isLoading = true;
-      _hasError = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _hasError = false;
+      });
+    }
 
     try {
       final wallpapers = await WallpaperService.getWallpapers(
         page: 1,
         perPage: _perPage,
       );
-      setState(() {
-        _wallpapers = wallpapers;
-        _wallpapersCache = wallpapers;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _wallpapers = wallpapers;
+          _wallpapersCache = wallpapers;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _hasError = true;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -63,13 +69,28 @@ class _WallpapersScreenState extends State<WallpapersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Choose Wallpaper',
-          style: GoogleFonts.urbanist(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Colors.white,
-          ),
+        automaticallyImplyLeading: false,
+        leadingWidth: 0,
+        titleSpacing: 0,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.of(context).pop(),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+            const SizedBox(width: 2),
+            Text(
+              'Choose Wallpaper',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w500,
+                fontSize: 20,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
         backgroundColor: const Color(0xFF213B44),
         elevation: 0,

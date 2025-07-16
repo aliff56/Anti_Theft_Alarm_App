@@ -226,17 +226,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF213B44),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          'Settings',
-          style: GoogleFonts.urbanist(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-          ),
+        automaticallyImplyLeading: false,
+        leadingWidth: 0,
+        titleSpacing: 0,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.of(context).pop(),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+            const SizedBox(width: 2),
+            Text(
+              'Settings',
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: 22,
+              ),
+            ),
+          ],
         ),
       ),
       body: Container(
@@ -263,23 +274,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Image.asset(
-                            'assets/icons/timer.png',
-                            width: 28,
-                            height: 28,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6.0),
+                            child: Image.asset(
+                              'assets/icons/timer.png',
+                              width: 28,
+                              height: 28,
+                            ),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: Text(
-                              'Set timer to deactivate alarm',
-                              style: GoogleFonts.poppins(
-                                color: Color(0xFF23414D),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 17,
-                              ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Set de-activation time',
+                                  style: GoogleFonts.poppins(
+                                    color: Color(0xFF23414D),
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 15,
+                                  ),
+                                ),
+
+                                Text(
+                                  'Alarm will auto-turn off :',
+                                  textAlign: TextAlign.left,
+                                  style: GoogleFonts.poppins(
+                                    color: Color(0xFFB0B6B9),
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                              ],
                             ),
                           ),
+
                           CustomSwitch(
                             value: _timerEnabled,
                             onChanged: (v) async {
@@ -288,107 +320,101 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'If the alarm feature is active, it will\nbe turned off at:',
-                        style: GoogleFonts.poppins(
-                          color: Color(0xFFB0B6B9),
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Color(0xFF23414D),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: TextButton(
-                          onPressed: () async {
-                            final picked = await showTimePicker(
-                              context: context,
-                              initialTime: _selectedTime,
-                              builder: (context, child) {
-                                return Theme(
-                                  data: Theme.of(context).copyWith(
-                                    colorScheme: const ColorScheme.light(
-                                      primary: Color(0xFF254451),
-                                      onPrimary: Colors.white,
-                                      onSurface: Colors.white,
-                                      surface: Colors.transparent,
-                                    ),
-                                    dialogBackgroundColor: Colors.transparent,
-                                    timePickerTheme: const TimePickerThemeData(
-                                      dialHandColor: Colors.black,
-                                    ),
-                                    textButtonTheme: TextButtonThemeData(
-                                      style: TextButton.styleFrom(
-                                        foregroundColor: Colors.white,
+                      const SizedBox(height: 6),
+                      Center(
+                        child: Container(
+                          width: 200,
+                          decoration: BoxDecoration(
+                            color: Color(0xFF23414D),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: TextButton(
+                            onPressed: () async {
+                              final picked = await showTimePicker(
+                                context: context,
+                                initialTime: _selectedTime,
+                                builder: (context, child) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: const ColorScheme.light(
+                                        primary: Color(0xFF254451),
+                                        onPrimary: Colors.white,
+                                        onSurface: Colors.white,
+                                        surface: Colors.transparent,
+                                      ),
+                                      dialogBackgroundColor: Colors.transparent,
+                                      timePickerTheme:
+                                          const TimePickerThemeData(
+                                            dialHandColor: Colors.black,
+                                          ),
+                                      textButtonTheme: TextButtonThemeData(
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: Colors.white,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  child: child == null
-                                      ? const SizedBox.shrink()
-                                      : Dialog(
-                                          backgroundColor: Colors.transparent,
-                                          insetPadding:
-                                              const EdgeInsets.symmetric(
-                                                horizontal: 32,
-                                                vertical: 32,
+                                    child: child == null
+                                        ? const SizedBox.shrink()
+                                        : Dialog(
+                                            backgroundColor: Colors.transparent,
+                                            insetPadding:
+                                                const EdgeInsets.symmetric(
+                                                  horizontal: 32,
+                                                  vertical: 32,
+                                                ),
+                                            child: Container(
+                                              decoration: const BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                  colors: [
+                                                    Color(0xFF2C5364),
+                                                    Color(0xFF203A43),
+                                                  ],
+                                                ),
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(16),
+                                                ),
                                               ),
-                                          child: Container(
-                                            decoration: const BoxDecoration(
-                                              gradient: LinearGradient(
-                                                begin: Alignment.topCenter,
-                                                end: Alignment.bottomCenter,
-                                                colors: [
-                                                  Color(0xFF2C5364),
-                                                  Color(0xFF203A43),
-                                                ],
+                                              child: SizedBox(
+                                                height: 550,
+                                                child: child,
                                               ),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(16),
-                                              ),
-                                            ),
-                                            child: SizedBox(
-                                              height: 550,
-                                              child: child,
                                             ),
                                           ),
-                                        ),
-                                );
-                              },
-                            );
-                            if (picked != null) {
-                              setState(() => _selectedTime = picked);
-                              await _saveSettings();
-                            }
-                          },
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                                  );
+                                },
+                              );
+                              if (picked != null) {
+                                setState(() => _selectedTime = picked);
+                                await _saveSettings();
+                              }
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                _formatTime(_selectedTime),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 22,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  _formatTime(_selectedTime),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                color: Colors.white,
-                                size: 28,
-                              ),
-                            ],
+                                const SizedBox(width: 8),
+                                const Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  color: Colors.white,
+                                  size: 28,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -414,13 +440,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: Text(
-                          'Auto-close app after activation',
-                          style: GoogleFonts.poppins(
-                            color: Color(0xFF23414D),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 17,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Auto Close',
+                              style: GoogleFonts.poppins(
+                                color: Color(0xFF23414D),
+                                fontWeight: FontWeight.w400,
+                                fontSize: 15,
+                              ),
+                            ),
+
+                            Text(
+                              'App will close after activation',
+                              textAlign: TextAlign.left,
+                              style: GoogleFonts.poppins(
+                                color: Color(0xFFB0B6B9),
+                                fontWeight: FontWeight.w300,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       CustomSwitch(
@@ -442,9 +483,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 8,
+                    vertical: 0,
                   ),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       _settingsTile(
                         'Share App',
@@ -495,17 +537,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Card(
           color: Colors.white,
           elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           child: Container(
             decoration: BoxDecoration(
               boxShadow: noShadowLabels.contains(label) ? [] : kCardShadow,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(6),
               color: Colors.white,
             ),
             child: ListTile(
-              contentPadding: EdgeInsets.zero,
+              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+              dense: true,
+              minVerticalPadding: 0,
               leading: leading != null
                   ? Icon(leading, color: const Color(0xFF23414D))
                   : null,
@@ -513,8 +555,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 label,
                 style: GoogleFonts.poppins(
                   color: Color(0xFF23414D),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 17,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 14,
                 ),
               ),
               trailing: Icon(icon, color: const Color(0xFF23414D)),

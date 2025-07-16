@@ -116,8 +116,8 @@ class DeactivatedScreen extends StatelessWidget {
                 Text(
                   'Anti-theft alert feature deactivated',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.urbanist(
-                    fontWeight: FontWeight.bold,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
                     fontSize: 20,
                     color: Colors.white,
                   ),
