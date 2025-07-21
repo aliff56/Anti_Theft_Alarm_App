@@ -309,8 +309,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     GestureDetector(
                       onTap: () async {
                         if (!_armed) {
-                          await _toggleArm();
-                          _showEnabledScreen();
+                          // Show countdown screen before arming
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => CountdownScreen(
+                                onCountdownComplete: () async {
+                                  await _toggleArm();
+                                  _showEnabledScreen();
+                                },
+                              ),
+                            ),
+                          );
                         } else {
                           await _toggleArm();
                         }
@@ -670,5 +679,102 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       }
     }
+  }
+}
+
+class CountdownScreen extends StatefulWidget {
+  final VoidCallback onCountdownComplete;
+  const CountdownScreen({Key? key, required this.onCountdownComplete})
+    : super(key: key);
+
+  @override
+  State<CountdownScreen> createState() => _CountdownScreenState();
+}
+
+class _CountdownScreenState extends State<CountdownScreen> {
+  int _seconds = 10;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_seconds == 1) {
+        timer.cancel();
+        widget.onCountdownComplete();
+        if (mounted) Navigator.of(context).pop();
+      } else {
+        setState(() => _seconds--);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF181A20),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Arming in',
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 24,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              '$_seconds',
+              style: GoogleFonts.poppins(
+                color: Colors.tealAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: 64,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Place your phone in position',
+              style: GoogleFonts.poppins(
+                color: Colors.white70,
+                fontWeight: FontWeight.w400,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: () {
+                _timer?.cancel();
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: const Color(0xFF203A43),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 12,
+                ),
+                textStyle: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                ),
+              ),
+              child: const Text('Cancel'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

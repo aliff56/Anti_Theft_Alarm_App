@@ -302,7 +302,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   'Alarm will auto-turn off :',
                                   textAlign: TextAlign.left,
                                   style: GoogleFonts.poppins(
-                                    color: Color(0xFFB0B6B9),
+                                    color: Colors.black.withOpacity(0.75),
                                     fontWeight: FontWeight.w300,
                                     fontSize: 12,
                                   ),
@@ -453,10 +453,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
 
                             Text(
-                              'App will close after activation',
+                              'App will auto-close after activation',
                               textAlign: TextAlign.left,
                               style: GoogleFonts.poppins(
-                                color: Color(0xFFB0B6B9),
+                                color: Colors.black.withOpacity(0.75),
                                 fontWeight: FontWeight.w300,
                                 fontSize: 12,
                               ),
@@ -496,7 +496,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _settingsTile(
                         'Rate us',
                         Icons.chevron_right,
-                        leading: Icons.star_outline,
+                        leading: Icons.thumb_up_outlined,
                       ),
                       _settingsTile(
                         'Feedback',
