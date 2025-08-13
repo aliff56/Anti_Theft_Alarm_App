@@ -1,4 +1,4 @@
-package com.example.antitheft
+package com.antitheft.alarm.phone.alarm.touch.alarm
 
 import android.content.Intent
 import android.os.Bundle

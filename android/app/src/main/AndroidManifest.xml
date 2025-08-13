@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.antitheft">
+    package="com.antitheft.alarm.phone.alarm.touch.alarm">
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -14,7 +14,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
     <application
-        android:label="antitheft"
+        android:label="Anti Theft Alarm: Phone Guard"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -40,7 +40,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name="com.example.antitheft.AntiTheftService"
+            android:name="com.antitheft.alarm.phone.alarm.touch.alarm.AntiTheftService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback"/>
         <receiver
